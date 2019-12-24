@@ -55,6 +55,8 @@ m1_perc
 #prior predictive check (can the model generate dataset that resemble the original dataset?)
 pp_check(m1_perc, type = "boxplot") #Yes. Yes it can. On the right track.
 
+saveRDS(m1_perc, file = 'm1_perc.rds')
+
 #extract posteriors to plot and summarize
 marg_m1_perc <- marginal_effects(m1_perc, effects = "age:dispersed")
 marg_m1__percdf <- as.data.frame(marg_m1_perc$`age:dispersed`)
@@ -184,6 +186,7 @@ as_tibble(posts_perc)  %>%
   gather() %>% 
   group_by(key) %>% 
   summarize(median = median(value),
+            sd = sd(value),
             low95 = quantile(value, probs = 0.025),
             high95 = quantile(value, probs = 0.975),
             prob_greater_0 = sum(value>0)/4000,
