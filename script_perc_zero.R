@@ -9,15 +9,21 @@ library(ggridges)
 #raw data
 bird_data <- read.csv(text = getURL("https://raw.githubusercontent.com/jswesner/liebl_birds/master/bird_data.csv?token=AETBVHH4E7BIPRHDOWFNAUK6AFUVQ"))
 
+#prior predictive model
+m1_prior <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/master/m1_perc_prior_predictive.rds?raw=true"))
+
+#final bayesian model
+m1_perc <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/master/m1_perc.rds?raw=true"))
+
 # Run models --------------------------------------------------------------
 
 #Prior predictive (model using only the priors)
-m1_prior <- brm(perc.zero ~ age*dispersed + (1|ind), data = bird_data,
-                family = Beta(link = "logit"),
-                prior = c(prior(normal(0,1), class = "b"),
-                          prior(normal(0,2), class = "Intercept"),
-                          prior(cauchy(0,1), class = "sd")),
-                sample_prior = "only")
+# m1_prior <- brm(perc.zero ~ age*dispersed + (1|ind), data = bird_data,
+#                 family = Beta(link = "logit"),
+#                 prior = c(prior(normal(0,1), class = "b"),
+#                           prior(normal(0,2), class = "Intercept"),
+#                           prior(cauchy(0,1), class = "sd")),
+#                 sample_prior = "only")
 
 #plot prior predictive marginal distributions
 marginal_effects(m1_prior, effects = "age:dispersed")
@@ -47,12 +53,12 @@ prior_fit %>%
 
 
 #Full Bayesian model. Same as above but with data added
-m1_perc <- brm(perc.zero ~ age*dispersed + (1|ind), data = bird_data,
-          family = Beta(link = "logit"),
-          prior = c(prior(normal(0,1), class = "b"),
-                    prior(normal(0,2), class = "Intercept"),
-                    prior(cauchy(0,1), class = "sd")),
-          cores = 2)
+# m1_perc <- brm(perc.zero ~ age*dispersed + (1|ind), data = bird_data,
+#           family = Beta(link = "logit"),
+#           prior = c(prior(normal(0,1), class = "b"),
+#                     prior(normal(0,2), class = "Intercept"),
+#                     prior(cauchy(0,1), class = "sd")),
+#           cores = 2)
 
 
 m1_perc
