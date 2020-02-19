@@ -114,7 +114,7 @@ plot_box_lines <- ggplot(data = posts_plot_perc, aes(x = as.numeric(age_full) + 
                                                      group = dispersed,
                                                      color = dispersed)) +
   geom_line(aes(group = interaction(iter,dispersed)),
-            alpha = 0.1) +
+            alpha = 0.05) +
   geom_boxplot(aes(group = interaction(dispersed,age)),
                outlier.shape = NA, width = 0.1) +
   scale_fill_brewer(type = "qual") +
