@@ -62,6 +62,7 @@ prior_fit %>%
 
 
 m1_perc
+
 #prior predictive check (can the model generate dataset that resemble the original dataset?)
 pp_check(m1_perc, type = "boxplot") #Yes. Yes it can. On the right track.
 
@@ -116,7 +117,6 @@ plot_box_lines <- ggplot(data = posts_plot_perc, aes(x = as.numeric(age_full) + 
             alpha = 0.1) +
   geom_boxplot(aes(group = interaction(dispersed,age)),
                outlier.shape = NA, width = 0.1) +
-  
   scale_fill_brewer(type = "qual") +
   scale_color_brewer(type = "qual") +
   geom_point(data = bird_data_plot, position = position_dodge(width = 0),
