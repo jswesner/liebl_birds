@@ -1,7 +1,8 @@
-key,mean,sd,low95,high95,prob_diff
-HF_no,-15760,31770,-82101,45513,0.29
-HF_gain,17621,10413,-988,39123,0.97
-HF_lose,18159,10381,788,41550,0.98
-FA_no,-6688,33486,-72368,63995,0.39
-FA_gain,9395,7490,-4366,25633,0.92
-FA_lose,-2589,8175,-18434,14735,0.34
+"Table 2. Changes in methylation between age transitions among natal and dispersing birds. Values represent the mean, standard deviation, and 95% credible intervals of the differences of the number of loci in each category (no change, gain of methylation, loss of methylation) between dispersers and natal birds from the posterior distribution of a Bayesian GLMM. prob_diff is the probability that a difference is greater than zero.",,,,,
+group,mean,sd,low95,high95,prob_diff
+HF_no,-16258,32576,-84600,45827,0.29
+HF_gain,17337,10144,-1954,39457,0.96
+HF_lose,18237,10470,13,41435,0.98
+FA_no,-7541,33299,-73593,61193,0.38
+FA_gain,9417,7922,-5039,26820,0.90
+FA_lose,-2396,7976,-17215,14275,0.35

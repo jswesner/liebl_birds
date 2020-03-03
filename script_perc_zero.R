@@ -147,7 +147,7 @@ plot_box_lines <- ggplot(data = posts_plot_perc, aes(x = as.numeric(age_full) + 
 
 plot_box_lines
 
-ggsave(plot_box_lines, file = "plot_box_lines.jpg", dpi = 600, width = 5, height = 4)
+ggsave(plot_box_lines, file = "plot_box_lines.jpg", dpi = 600, width = 6, height = 4)
 
 
 # Quantitative summaries of the posterior ----------------------------------------------
@@ -178,3 +178,52 @@ as_tibble(posts_perc)  %>%
             prob_lessthan_0 = sum(value<0)/4000)
 
 
+
+
+
+
+
+
+# Prior v posterior -------------------------------------------------------
+
+
+prior_pred_percent <- prior_fit %>% 
+  mutate(iter = 1:nrow(.)) %>% 
+  gather(key, value, -iter) %>% 
+  separate(key, c("age","dispersed")) %>% 
+  mutate(age = fct_relevel(age, "H", "F"),
+         age_full = case_when(age == "H" ~ "Hatchling",
+                              age == "F" ~ "Fledgling",
+                              age == "A" ~ "Adult"),
+         age_full = fct_relevel(age_full, "Hatchling","Fledgling"),
+         offset = case_when(dispersed == "D" ~ -0.1,
+                            TRUE ~ 0.1),
+         behavior = case_when(dispersed == "D" ~ "disperse",
+                              TRUE ~ "natal")) %>% 
+  ggplot(aes(x = as.numeric(age_full) + offset, y = value, 
+                                     group = behavior)) +
+  geom_line(aes(group = interaction(iter,behavior),
+                color = behavior),
+            alpha = 0.1) +
+  geom_boxplot(aes(group = interaction(behavior,age),
+                   fill = behavior),
+               outlier.shape = NA, width = 0.1) +
+  scale_fill_viridis_d(option = "E") +
+  scale_color_viridis_d(option = "E") +
+  ylab("Proportion methylated") +
+  # scale_shape_manual(values = c(21,24)) +
+  theme_classic() +
+  theme(axis.title.x = element_blank(),
+        text = element_text(size = 14)) +
+  scale_x_continuous(breaks=c(1, 2, 3),
+                     labels=c("Hatchling", "Fledgling", "Adult")) +
+  NULL 
+
+
+
+prior_v_post_proportion <- plot_grid(prior_pred_percent + ggtitle("Prior") + theme(legend.position = "top"),
+          plot_box_lines + ggtitle("Posterior") + theme(legend.position = "top"))
+
+
+ggsave(prior_v_post_proportion, file = "prior_v_post_proportion.jpg", dpi = 600, width = 8.5, height = 4)         
+          
