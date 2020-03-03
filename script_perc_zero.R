@@ -3,6 +3,7 @@ library(tidyverse)
 library(janitor)
 library(RCurl)
 library(ggridges)
+library(viridis)
 
 
 # Load data and models from github ---------------------------------------------------
@@ -15,7 +16,12 @@ m1_prior <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/master/m1_
 #final bayesian model
 m1_perc <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/master/m1_perc.rds?raw=true"))
 
-# Run models --------------------------------------------------------------
+
+
+
+
+
+# Prior predictive distribution - fit prior model only and plot to check if prior expectations are reasonable --------------------------------------------------------------
 
 #Prior predictive (model using only the priors)
 # m1_prior <- brm(perc.zero ~ age*dispersed + (1|ind), data = bird_data,
@@ -25,10 +31,10 @@ m1_perc <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/master/m1_p
 #                           prior(cauchy(0,1), class = "sd")),
 #                 sample_prior = "only")
 
-#plot prior predictive marginal distributions
+#quick plot of prior predictive marginal distributions
 marginal_effects(m1_prior, effects = "age:dispersed")
 
-saveRDS(m1_prior, file = 'm1_perc_prior_predictive.rds')
+# saveRDS(m1_prior, file = 'm1_perc_prior_predictive.rds')
 
 #data to condition on
 new_data <- expand.grid(age = unique(bird_data$age), 
@@ -52,6 +58,10 @@ prior_fit %>%
 
 
 
+
+
+
+
 #Full Bayesian model. Same as above but with data added
 # m1_perc <- brm(perc.zero ~ age*dispersed + (1|ind), data = bird_data,
 #           family = Beta(link = "logit"),
@@ -66,7 +76,7 @@ m1_perc
 #prior predictive check (can the model generate dataset that resemble the original dataset?)
 pp_check(m1_perc, type = "boxplot") #Yes. Yes it can. On the right track.
 
-saveRDS(m1_perc, file = 'm1_perc.rds')
+# saveRDS(m1_perc, file = 'm1_perc.rds')
 
 #extract posteriors to plot and summarize
 marg_m1_perc <- marginal_effects(m1_perc, effects = "age:dispersed")
@@ -91,7 +101,9 @@ bird_data_plot <- bird_data %>%
                               age == "A" ~ "Adult"),
          age_full = fct_relevel(age_full, "Hatchling","Fledgling"),
          offset = case_when(dispersed == "D" ~ -0.1,
-                            TRUE ~ 0.1))
+                            TRUE ~ 0.1),
+         behavior = case_when(dispersed == "D" ~ "disperse",
+                               TRUE ~ "natal"))
 
 #posterior data to plot
 posts_plot_perc <-  as_tibble(posts_perc) %>% 
@@ -105,29 +117,35 @@ posts_plot_perc <-  as_tibble(posts_perc) %>%
                               age == "A" ~ "Adult"),
          age_full = fct_relevel(age_full, "Hatchling","Fledgling"),
          offset = case_when(dispersed == "D" ~ -0.1,
-                            TRUE ~ 0.1))
+                            TRUE ~ 0.1),
+         behavior = case_when(dispersed == "D" ~ "disperse",
+                               TRUE ~ "natal"))
 
 
 
-
+#combine raw and posterior data in a single plot
 plot_box_lines <- ggplot(data = posts_plot_perc, aes(x = as.numeric(age_full) + offset, y = perc.zero, 
-                                                     group = dispersed,
-                                                     color = dispersed)) +
-  geom_line(aes(group = interaction(iter,dispersed)),
-            alpha = 0.05) +
-  geom_boxplot(aes(group = interaction(dispersed,age)),
+                                                     group = behavior)) +
+  geom_line(aes(group = interaction(iter,behavior),
+                color = behavior),
+            alpha = 0.1) +
+  geom_boxplot(aes(group = interaction(behavior,age),
+                   fill = behavior),
                outlier.shape = NA, width = 0.1) +
-  scale_fill_brewer(type = "qual") +
-  scale_color_brewer(type = "qual") +
+  scale_color_viridis_d(option = "E") +
+  scale_fill_viridis_d(option = "E") +
   geom_point(data = bird_data_plot, position = position_dodge(width = 0),
-             aes(shape = dispersed)) +
+             aes(shape = behavior), color = "grey40", size = 1.5) +
   ylab("Proportion methylated") +
+  # scale_shape_manual(values = c(21,24)) +
   theme_classic() +
   theme(axis.title.x = element_blank(),
         text = element_text(size = 14)) +
   scale_x_continuous(breaks=c(1, 2, 3),
                    labels=c("Hatchling", "Fledgling", "Adult")) +
   NULL 
+
+plot_box_lines
 
 ggsave(plot_box_lines, file = "plot_box_lines.jpg", dpi = 600, width = 5, height = 4)
 
@@ -158,60 +176,5 @@ as_tibble(posts_perc)  %>%
             low95 = quantile(value, probs = 0.025),
             high95 = quantile(value, probs = 0.975),
             prob_lessthan_0 = sum(value<0)/4000)
-
-
-
-#boxplot
-# plot_boxplot <- ggplot(data = posts_plot_perc, aes(x = age_full, y = perc.zero, 
-#                                                     fill = dispersed, group = dispersed)) +
-#   geom_boxplot(aes(group = interaction(age, dispersed)), outlier.shape = NA,
-#                width = 0.4) +
-#   scale_fill_grey(start = 0.5, end = 1) +
-#   geom_point(data = bird_data_plot, position = position_dodge(width = 0.4)) +
-#   ylab("Proportion methylated") +
-#   theme_classic() +
-#   theme(axis.title.x = element_blank(),
-#         text = element_text(size = 14)) +
-#   NULL
-# 
-# ggsave(plot_boxplot, file = "plot_boxplot.jpg", dpi = 600, width = 5, height = 4)
-# 
-# 
-# plot_violin <- ggplot(data = posts_plot_perc, aes(x = age_full, y = perc.zero, 
-#                                                    fill = dispersed, group = dispersed)) +
-#   geom_violin(aes(group = interaction(age, dispersed)), 
-#                width = 0.4) +
-#   scale_fill_grey(start = 0.5, end = 1) +
-#   geom_point(data = bird_data_plot, position = position_dodge(width = 0.4)) +
-#   ylab("Proportion methylated") +
-#   theme_classic() +
-#   theme(axis.title.x = element_blank(),
-#         text = element_text(size = 14)) +
-#   NULL
-# 
-# 
-# ggsave(plot_violin, file = "plot_violin.jpg", dpi = 600, width = 5, height = 4)
-# 
-# 
-# plot_violin_lines <- ggplot(data = posts_plot_perc, aes(x = age_full, y = perc.zero, 
-#                                                   group = dispersed,
-#                                                   color = dispersed)) +
-#   geom_violin(aes(group = interaction(dispersed,age)),
-#               position = position_dodge(width = 0)) +
-#   geom_line(aes(group = interaction(dispersed, iter)),
-#             alpha = 0.01) +
-#   scale_fill_brewer(type = "qual") +
-#   scale_color_brewer(type = "qual") +
-#   geom_point(data = bird_data_plot, position = position_dodge(width = 0),
-#              aes(shape = dispersed)) +
-#   ylab("Proportion methylated") +
-#   theme_classic() +
-#   theme(axis.title.x = element_blank(),
-#         text = element_text(size = 14)) +
-#   NULL
-# 
-# ggsave(plot_violin_lines, file = "plot_violin_lines.jpg", dpi = 600, width = 5, height = 4)
-
-
 
 
