@@ -23,15 +23,17 @@ change_two <- read.csv(text = getURL("https://raw.githubusercontent.com/jswesner
 
 
   
+binom_brm <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/master/binom_brm.rds?raw=true"))
+# binom_brm <- brm(changed|trials(total) ~ age.transition*behavior + (1|ind),
+#                  family = binomial(link = "logit"),
+#                  data = change_two,
+#                  prior = c(prior(normal(0,1), class = "Intercept"),
+#                            prior(normal(0,1), class = "b"),
+#                            prior(cauchy(0,1), class = "sd")),
+#                  sample_prior = T)
+#                  
+# saveRDS(binom_brm, file = "binom_brm.rds")
 
-binom_brm <- brm(changed|trials(total) ~ age.transition*behavior + (1|ind),
-                 family = binomial(link = "logit"),
-                 data = change_two,
-                 prior = c(prior(normal(0,1), class = "Intercept"),
-                           prior(normal(0,1), class = "b"),
-                           prior(cauchy(0,1), class = "sd")),
-                 sample_prior = T)
-                 
 #prior predictive               
 pp_check(binom_brm, type = "boxplot")
 
@@ -128,8 +130,7 @@ posts %>%
   summarize(mean = mean(p),
             sd = sd(p),
             low95 = quantile(p, probs = 0.025),
-            high95 = quantile(p, probs = 0.975),
-            prob_p = sum(p>0)/max(iter)) 
+            high95 = quantile(p, probs = 0.975)) 
 
 posts %>% 
   group_by(age, disperse) %>% 
