@@ -20,13 +20,13 @@ m2_change_full <- readRDS(url("https://github.com/jswesner/liebl_birds/blob/mast
 
 # Prior predictive (model using only the priors)
 
-m2_change_prior <- brm(number.change ~ type.change*behavior*age.transition + (1|ind),
-                 data = change,
-                 family = Gamma(link = "log"),
-                 prior = c(prior(normal(0,1), class = "b"),
-                           prior(normal(11,1), class = "Intercept"),
-                           prior(cauchy(0,1), class = "sd")),
-                 sample_prior = "only")
+# m2_change_prior <- brm(number.change ~ type.change*behavior*age.transition + (1|ind),
+#                  data = change,
+#                  family = Gamma(link = "log"),
+#                  prior = c(prior(normal(0,1), class = "b"),
+#                            prior(normal(11,1), class = "Intercept"),
+#                            prior(cauchy(0,1), class = "sd")),
+#                  sample_prior = "only")
 
 # saveRDS(m2_change_prior, file = "m2_change_prior.rds")
 marginal_effects(m2_change_prior)
