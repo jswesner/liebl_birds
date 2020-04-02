@@ -103,7 +103,7 @@ bird_data_plot <- bird_data %>%
          offset = case_when(dispersed == "D" ~ -0.1,
                             TRUE ~ 0.1),
          behavior = case_when(dispersed == "D" ~ "disperse",
-                               TRUE ~ "natal"))
+                               TRUE ~ "philopatric"))
 
 #posterior data to plot
 posts_plot_perc <-  as_tibble(posts_perc) %>% 
@@ -119,7 +119,7 @@ posts_plot_perc <-  as_tibble(posts_perc) %>%
          offset = case_when(dispersed == "D" ~ -0.1,
                             TRUE ~ 0.1),
          behavior = case_when(dispersed == "D" ~ "disperse",
-                               TRUE ~ "natal"))
+                               TRUE ~ "philopatric"))
 
 
 
@@ -199,7 +199,7 @@ prior_pred_percent <- prior_fit %>%
          offset = case_when(dispersed == "D" ~ -0.1,
                             TRUE ~ 0.1),
          behavior = case_when(dispersed == "D" ~ "disperse",
-                              TRUE ~ "natal")) %>% 
+                              TRUE ~ "philopatric")) %>% 
   ggplot(aes(x = as.numeric(age_full) + offset, y = value, 
                                      group = behavior)) +
   geom_line(aes(group = interaction(iter,behavior),

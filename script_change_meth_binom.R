@@ -18,7 +18,7 @@ change_two <- read.csv(text = getURL("https://raw.githubusercontent.com/jswesner
          not_changed = total - changed,
          p = changed/total,
          age = fct_relevel(age.transition, "HF"),
-         disperse = case_when(behavior == "n" ~ "natal", TRUE ~ "disperse")) %>% 
+         disperse = case_when(behavior == "n" ~ "philopatric", TRUE ~ "disperse")) %>% 
   filter(type.change.two != "no")
 
 
@@ -70,7 +70,7 @@ posts <- posteriors %>%
   gather(param, log_odds, -iter) %>% 
   mutate(p = inv_logit_scaled(log_odds),
          age = case_when(grepl("posts_a", param) ~ "FA", TRUE ~ "HF"),
-         disperse = case_when(grepl("n", param) ~ "natal", TRUE ~ "disperse"),
+         disperse = case_when(grepl("n", param) ~ "philopatric", TRUE ~ "disperse"),
          age = fct_relevel(age, "HF"))
 
 
@@ -86,9 +86,9 @@ prior_post <- posts %>% mutate(model = "posterior") %>%
   bind_rows(prior_pred %>% mutate(model = "prior prediction")) %>% 
   mutate(trt = str_sub(param, -2, -1),
          trt = case_when(trt == "ad" ~ "FA_disperse",
-                         trt == "an" ~ "FA_natal",
+                         trt == "an" ~ "FA_philopatric",
                          trt == "fd" ~ "HF_disperse",
-                         trt == "fn" ~ "HF_natal")) %>% 
+                         trt == "fn" ~ "HF_philopatric")) %>% 
   as_tibble()
 
 
@@ -100,7 +100,7 @@ plot_priorvpost_meth <- prior_post %>%
   theme(axis.title.y = element_blank()) +
   labs(x = "Proportion of loci that changed methylation")
 
-ggsave(plot_priorvpost_meth, file = "plot_priorvpost_meth.jpg", dpi = 600, width = 7, height = 5.5)
+# ggsave(plot_priorvpost_meth, file = "plot_priorvpost_meth.jpg", dpi = 600, width = 7, height = 5.5)
 
 
 #make plot
@@ -125,21 +125,27 @@ ggsave(plot_change_meth_two, file = "plot_change_meth_two.jpg", dpi = 600, width
 
 
 #summary_stats
-posts %>% 
+tbl <- summary_table_change <- posts %>%  
   group_by(age, disperse) %>% 
   summarize(mean = mean(p),
             sd = sd(p),
             low95 = quantile(p, probs = 0.025),
-            high95 = quantile(p, probs = 0.975)) 
+            high95 = quantile(p, probs = 0.975)) %>% 
+  as_tibble()
 
-posts %>% 
+
+write.csv(tbl, file = "tbl_change.csv")
+
+tbl_changediff <- posts %>% 
   group_by(age, disperse) %>% 
   select(iter, p, age, disperse) %>% 
   pivot_wider(names_from = disperse, values_from = p) %>% 
-  mutate(diff = disperse - natal) %>% 
+  mutate(diff = disperse - philopatric) %>% 
   group_by(age) %>% 
   summarize(mean = mean(diff),
             sd = sd(diff),
             low95 = quantile(diff, probs = 0.025),
             high95 = quantile(diff, probs = 0.975),
             prob_diff = sum(diff>0)/max(iter)) 
+
+write.csv(tbl_changediff, file= "tbl_changed_diff.csv")
