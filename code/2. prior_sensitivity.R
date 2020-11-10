@@ -27,6 +27,17 @@ confint(test) %>% as_tibble() %>% slice(1:6)
 
 coefs <- c("intercept", "ageF", "ageH", "behaviorN", "ageF:behaviorN","ageH:behaviorN")
 
+
+#load Bayesian models
+m1_perc <- readRDS("models/m1_perc.rds")
+m1_perc_t1 <- readRDS("models/m1_perc_t1.rds")
+m1_perc_t2 <- readRDS("models/m1_perc_t2.rds")
+m1_perc_t3 <- readRDS("models/m1_perc_t3.rds")
+m1_perc_t4 <- readRDS("models/m1_perc_t4.rds")
+m1_perc_t5 <- readRDS("models/m1_perc_t5.rds")
+m1_perc_t6 <- readRDS("models/m1_perc_t6.rds")
+
+
 m1_perc_1 <- fixef(m1_perc) %>% as_tibble() %>% mutate(sd = "1 (model in MS)", coef = coefs)
 m1_perc_0.1 <- fixef(m1_perc_t1) %>% as_tibble() %>% mutate(sd = "0.1", coef = coefs)
 m1_perc_0.3 <- fixef(m1_perc_t2) %>% as_tibble() %>% mutate(sd = "0.3", coef = coefs)
@@ -62,8 +73,9 @@ prior_sens_plot_perczero <-combine_ests %>%
          size = F)
   
 prior_sens_plot_perczero
+saveRDS(prior_sens_plot_perczero, file = "plots/prior_sens_plot_perczero.rds")
 
-ggsave(prior_sens_plot_perczero, file = "plots/prior_sens_plot.jpg", dpi = 600, width = 5, height = 5)  
+ggsave(prior_sens_plot_perczero, file = "plots/prior_sens_plot.tiff", dpi = 400, width = 5, height = 5)  
 
 m1_perc_t0 <- m1_perc
 
@@ -115,7 +127,9 @@ perc_sens_outcome_perczero <- perc_stack %>%
   theme_classic() +
   theme(legend.position = "top")
 
-ggsave(perc_sens_outcome_perczero, file = "plots/perc_sens_outcome_perczero.jpg", dpi = 600, 
+saveRDS(perc_sens_outcome_perczero, file = "perc_sens_outcome_perczero.rds")
+
+ggsave(perc_sens_outcome_perczero, file = "plots/perc_sens_outcome_perczero.tiff", dpi = 400, 
        width = 8, height = 3)
 
 
@@ -260,7 +274,8 @@ prior_sens_plot_cont <- combine_ests_cont %>%
 
 prior_sens_plot_cont
 
-ggsave(prior_sens_plot_perczero, file = "plots/prior_sens_plot.jpg", dpi = 600, width = 5, height = 5)  
+saveRDS(prior_sens_plot_cont, file = "plots/prior_sens_plot_cont.rds")
+ggsave(prior_sens_plot_cont, file = "plots/prior_sens_plot_cont.tiff", dpi = 400, width = 5, height = 5)  
 
 
 
@@ -311,8 +326,8 @@ cont_sens_outcome_cont <- cont_stack_full %>%
   theme_classic() +
   theme(legend.position = "top")
 
-
-ggsave(cont_sens_outcome_cont, file = "plots/cont_sens_outcome_cont.jpg", dpi = 600, 
+saveRDS(cont_sens_outcome_cont, file = "plots/cont_sens_outcome_cont.rds")
+ggsave(cont_sens_outcome_cont, file = "plots/cont_sens_outcome_cont.tiff", dpi = 400, 
        width = 8, height = 3)
 
 
@@ -322,5 +337,10 @@ plot_param_sens <- plot_grid(prior_sens_plot_perczero + guides(color = F, shape 
                              prior_sens_plot_cont + guides(color = F, shape = F),
                              legend_param_sens, nrow = 1, labels = c("a","b",NA), rel_widths = c(1,1.1,0.3))
 
-ggsave(plot_predict_sens, file = "plots/plot_predict_sens.jpg", dpi = 600, width = 8, height = 5)
-ggsave(plot_param_sens, file = "plots/plot_param_sens.jpg", dpi = 600, width = 8, height = 5)
+saveRDS(plot_predict_sens, file = "plots/plot_predict_sens.rds")
+saveRDS(plot_param_sens, file = "plots/plot_param_sens.rds")
+
+ggsave(plot_predict_sens, file = "plots/plot_predict_sens.tiff", dpi = 400, width = 8, height = 5)
+ggsave(plot_param_sens, file = "plots/plot_param_sens.tiff", dpi = 400, width = 8, height = 5)
+
+

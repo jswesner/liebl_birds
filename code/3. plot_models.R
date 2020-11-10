@@ -79,7 +79,8 @@ plot_box_lines <- ggplot(data = posts_plot_perc, aes(x = as.numeric(age_full) + 
 
 plot_box_lines
 
-ggsave(plot_box_lines, file = "plots/plot_box_lines.jpg", dpi = 600, width = 6, height = 4)
+saveRDS(plot_box_lines, file = "plots/plot_box_lines.rds")
+ggsave(plot_box_lines, file = "plots/plot_box_lines.tiff", dpi = 350, width = 6, height = 4)
 
 
 # Age.transition x Behavior ---------------------------------------------------
@@ -91,7 +92,8 @@ change_in_methylation_over_time_cont_data <- read_excel("data/change in methylat
 change_cont_brm <- readRDS(file = "models/change_cont_brm.rds")
 
 post_check_cont <- pp_check(change_cont_brm, type = "boxplot")
-ggsave(post_check_cont, file = "plots/post_check_cont.jpg", width = 6, height = 4, dpi = 600)
+saveRDS(post_check_cont, file = "plots/post_check_cont.rds")
+ggsave(post_check_cont, file = "plots/post_check_cont.tiff", width = 6, height = 4, dpi = 400)
 
 post_cont <- posterior_samples(change_cont_brm) %>% as_tibble() %>% clean_names() %>% mutate(iter = 1:nrow(.)) %>% 
   mutate(N_HF = b_intercept + b_behavior_n,
@@ -126,8 +128,8 @@ cont_plot <- post_cont_plotdata %>%
 
 cont_plot
 
-
-ggsave(cont_plot, file = "plots/cont_plot.jpg", dpi = 600, width = 5, height = 4)
+saveRDS(cont_plot, file = "plots/cont_plot.rds")
+ggsave(cont_plot, file = "plots/cont_plot.tiff", dpi = 400, width = 5, height = 4)
 
 
 # summarize posteriors
@@ -154,7 +156,7 @@ post_cont_plotdata %>%
 
 # Sex ---------------------------------------------------------------------
 
-
+binary_total_methylation_sex <- read_xlsx("data/binary total methylation sex.xlsx") %>% clean_names()
 meth_sex.brm <- readRDS("models/meth_sex.brm")
 saveRDS(meth_sex.brm, file = "models/meth_sex.brm")
 
@@ -179,7 +181,8 @@ meth_sex_plot <- meth_sex_post %>%
 
 meth_sex_plot
 
-ggsave(meth_sex_plot, file = "plots/meth_sex_plot.jpg" , dpi = 600, width = 4, height = 4)
+saveRDS(meth_sex_plot, file = "plots/meth_sex_plot.rds")
+ggsave(meth_sex_plot, file = "plots/meth_sex_plot.tiff" , dpi = 400, width = 4, height = 4)
 
 
 # summary stats

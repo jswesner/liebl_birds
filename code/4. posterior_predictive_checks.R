@@ -16,4 +16,5 @@ ppc_change <- pp_check(change_cont_brm, type = "boxplot") +
 
 
 posterior_predictive_checks <- plot_grid(ncol = 1, ppc_perc, ppc_change, labels = "auto")
-ggsave(posterior_predictive_checks, file = "plots/posterior_predictive_checks.jpg", width = 5, height = 6)
+saveRDS(posterior_predictive_checks, file = "plots/posterior_predictive_checks.rds")
+ggsave(posterior_predictive_checks, file = "plots/posterior_predictive_checks.tiff", width = 5, height = 6)
