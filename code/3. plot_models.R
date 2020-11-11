@@ -206,3 +206,46 @@ post_meth_sex_diff %>%
 
 
 
+
+# SI ---------------------
+# Fig S2
+
+m1_perc
+m1_perc_prior <- update(m1_perc, sample_prior = "only")
+change_cont_brm
+change_cont_brm_prior <- update(change_cont_brm, sample_prior = "only")
+
+m1_perc_ce <- conditional_effects(m1_perc)
+m1_perc_prior_ce <- conditional_effects(m1_perc_prior)
+change_cont_brm_ce <- conditional_effects(change_cont_brm)
+change_cont_brm_prior_ce <- conditional_effects(change_cont_brm_prior)
+
+m1_perc_ce2 <- m1_perc_ce$`age:behavior` %>% as_tibble() %>% clean_names() %>% mutate(model = "prop_change",
+                                                                                     method = "Posterior")
+m1_perc_prior_ce2 <- m1_perc_prior_ce$`age:behavior` %>% as_tibble() %>% clean_names() %>% mutate(model = "prop_change",
+                                                                                                 method = "Prior")
+change_cont_brm_ce2 <- change_cont_brm_ce$`age.transition:behavior` %>% as_tibble() %>% clean_names() %>% mutate(model = "meth_change",
+                                                                                                                method = "Posterior",
+                                                                                                                age = age_transition)
+change_cont_brm_prior_ce2 <- change_cont_brm_prior_ce$`age.transition:behavior` %>% as_tibble() %>% clean_names() %>% mutate(model = "meth_change",
+                                                                                                                            method = "Prior",
+                                                                                                                            age = age_transition)
+
+all <- bind_rows(m1_perc_ce2, m1_perc_prior_ce2, change_cont_brm_ce2, change_cont_brm_prior_ce2) %>% 
+  mutate(behavior = as.character(behavior), 
+         behavior = case_when(behavior == "N" ~ "P", TRUE ~ behavior),
+         method = fct_relevel(method, "Prior"))
+
+
+
+prior_v_post <- all %>% 
+  ggplot(aes(x = age, y = estimate, ymin = lower, ymax = upper, color = behavior)) + 
+  geom_pointrange(position = position_dodge(width = 0.2)) +
+  facet_grid(method ~ model, scales = "free") +
+  labs(x = "Age Transition or Age", 
+       y = "Estimate")
+
+saveRDS(prior_v_post, file = "plots/prior_v_post.rds")
+ggsave(prior_v_post, file = "plots/prior_v_post.tiff", dpi = 400, width = 5, height = 4)
+
+
