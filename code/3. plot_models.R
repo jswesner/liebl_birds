@@ -83,6 +83,23 @@ saveRDS(plot_box_lines, file = "plots/plot_box_lines.rds")
 ggsave(plot_box_lines, file = "plots/plot_box_lines.tiff", dpi = 350, width = 6, height = 4)
 
 
+
+posts_plot_perc %>% 
+  group_by(age, dispersed) %>% 
+  summarize(mean = mean(methylated.perc),
+            lower = quantile(methylated.perc, probs = 0.025),
+            upper = quantile(methylated.perc, probs = 0.975))
+
+posts_plot_perc %>% 
+  select(-age_full, -offset, -behavior) %>% 
+  pivot_wider(names_from = dispersed, values_from = methylated.perc) %>% 
+  mutate(diff = N-D) %>% 
+  group_by(age) %>% 
+  summarize(mean = mean(diff),
+            lower = quantile(diff, probs = 0.025),
+            upper = quantile(diff, probs = 0.975),
+            prob_diff = sum(diff>0)/1000)
+
 # Age.transition x Behavior ---------------------------------------------------
 
 change_in_methylation_over_time_cont_data <- read_excel("data/change in methylation over time- cont data.xlsx") %>% 
