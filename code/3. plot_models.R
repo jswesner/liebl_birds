@@ -82,11 +82,10 @@ plot_box_lines
 saveRDS(plot_box_lines, file = "plots/plot_box_lines.rds")
 ggsave(plot_box_lines, file = "plots/plot_box_lines.tiff", dpi = 350, width = 6, height = 4)
 
-
-
 posts_plot_perc %>% 
   group_by(age, dispersed) %>% 
   summarize(mean = mean(methylated.perc),
+            sd = sd(methylated.perc),
             lower = quantile(methylated.perc, probs = 0.025),
             upper = quantile(methylated.perc, probs = 0.975))
 
